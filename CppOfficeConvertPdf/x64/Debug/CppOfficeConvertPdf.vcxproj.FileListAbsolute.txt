@@ -1,0 +1,1 @@
+D:\sourcecode\OfficeConvertPdfLibrary\CppOfficeConvertPdf\x64\Debug\CppOfficeConvertPdf.vcxproj.AssemblyReference.cache

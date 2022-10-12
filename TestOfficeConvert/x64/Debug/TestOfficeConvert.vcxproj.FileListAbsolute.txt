@@ -1,0 +1,1 @@
+D:\sourcecode\OfficeConvertPdfLibrary\TestOfficeConvert\x64\Debug\TestOfficeConvert.vcxproj.AssemblyReference.cache
