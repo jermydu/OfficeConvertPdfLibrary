@@ -19,7 +19,7 @@ class CPPOFFICECONVERTPDF_API CCppOfficeConvertPdf {
 public:
 	CCppOfficeConvertPdf(void);
 	// TODO: 在此处添加方法。
-	bool ConvertPdf(std::string type,std::string inPath, std::string outPath);
+	bool ConvertPdf(std::string type,std::string inPath, std::string outPath, std::string pngPath);
 };
 
 extern CPPOFFICECONVERTPDF_API int nCppOfficeConvertPdf;

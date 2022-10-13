@@ -24,11 +24,12 @@ CCppOfficeConvertPdf::CCppOfficeConvertPdf()
     return;
 }
 
-bool CCppOfficeConvertPdf::ConvertPdf(std::string type, std::string inPath, std::string outPath)
+bool CCppOfficeConvertPdf::ConvertPdf(std::string type, std::string inPath, std::string outPath,std::string pngPath)
 {
 	System::String^ strType = gcnew System::String(type.c_str());
 	System::String^ strInPath = gcnew System::String(inPath.c_str());
 	System::String^ strOutPath = gcnew System::String(outPath.c_str());
+	System::String^ strPngPath = gcnew System::String(pngPath.c_str());
 	ClassOfficeConvertPdfLibrary^ pConvertClass = gcnew ClassOfficeConvertPdfLibrary();
 	if (strType == "xlsx")
 	{
@@ -55,7 +56,7 @@ bool CCppOfficeConvertPdf::ConvertPdf(std::string type, std::string inPath, std:
 		}
 	}else if (strType == "pptx")
 	{
-		int pptResult = pConvertClass->PowerPointConvertPdf(strInPath, strOutPath);
+		int pptResult = pConvertClass->PowerPointConvertPdf(strInPath, strOutPath, strPngPath);
 		if (pptResult == 0)
 		{
 			return false;

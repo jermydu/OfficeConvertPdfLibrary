@@ -11,11 +11,19 @@ using PowerPoint = Microsoft.Office.Interop.PowerPoint;
 using Word = Microsoft.Office.Interop.Word;
 using Excel = Microsoft.Office.Interop.Excel;
 
+//引入ImageMagick
+using ImageMagick;
+
 namespace OfficeConvertPdfLibrary
 {
     public class ClassOfficeConvertPdfLibrary
     {
-        public int PowerPointConvertPdf(String pptPath,String pdfPath)
+        private const float BaseDpiForPdfConversion = 200f;
+        private const int PdfSuperSamplingRatio = 1;
+        int pdfPageCount = 0;
+        int CurrentOutputFilePathIndex = 0;
+        String pngPath = "";
+        public int PowerPointConvertPdf(String pptPath,String pdfPath,String pngPath)
         {
             PowerPoint.Application pptApplication;
             pptApplication = new PowerPoint.Application();
@@ -41,6 +49,8 @@ namespace OfficeConvertPdfLibrary
             //调用GC的垃圾收集方法
             GC.Collect();
             GC.WaitForPendingFinalizers();
+
+            ConvertPdf(pdfPath, pngPath);
 
             return 1;
         }
@@ -105,6 +115,42 @@ namespace OfficeConvertPdfLibrary
             GC.WaitForPendingFinalizers();
 
             return 1;
+        }
+
+        //pdf 转 图片
+        private void ConvertPdf(String InputFilePath, String OutputFilePath)
+        {
+            MagickReadSettings settings = new MagickReadSettings();
+
+            float dpi = BaseDpiForPdfConversion;
+          
+            settings.Density = new Density(dpi * PdfSuperSamplingRatio);
+            using (MagickImageCollection images = new MagickImageCollection())
+            {
+                //添加pdf所有页到collection
+                images.Read(InputFilePath, settings);
+                pdfPageCount = images.Count;
+
+                //遍历每一页
+                foreach (MagickImage image in images)
+                {
+                    if (PdfSuperSamplingRatio > 1)
+                    {
+                        image.Scale(new Percentage(100 / PdfSuperSamplingRatio));
+                    }
+                    pngPath = String.Format("{0}\\png-{1}.png", OutputFilePath,CurrentOutputFilePathIndex);
+                    ConvertImage(image, true);
+
+                    CurrentOutputFilePathIndex++;
+                }
+            }
+        }
+
+        private void ConvertImage(MagickImage image, bool ignoreScale = false)
+        {
+            image.Quality = 95;
+
+            image.Write(this.pngPath);
         }
     }
 }

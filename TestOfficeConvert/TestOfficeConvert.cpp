@@ -31,7 +31,7 @@ int main()
 		std::cout << "test.docx 转换成功" << std::endl;
 	}
 
-	int pptResult = pConvertClass->PowerPointConvertPdf("D:\\sourcecode\\OfficeConvertPdfLibrary\\x64\\Debug\\test.pptx","D:\\sourcecode\\OfficeConvertPdfLibrary\\x64\\Debug\\test_ppt.pdf");
+	int pptResult = pConvertClass->PowerPointConvertPdf("D:\\sourcecode\\OfficeConvertPdfLibrary\\x64\\Debug\\test.pptx","D:\\sourcecode\\OfficeConvertPdfLibrary\\x64\\Debug\\test_ppt.pdf","D:\\sourcecode\\OfficeConvertPdfLibrary\\x64\\Debug");
 	if (pptResult == 0)
 	{
 		std::cout << "test.pptx 转换失败" << std::endl;
