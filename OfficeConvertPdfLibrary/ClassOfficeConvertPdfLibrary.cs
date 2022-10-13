@@ -20,7 +20,9 @@ namespace OfficeConvertPdfLibrary
             PowerPoint.Application pptApplication;
             pptApplication = new PowerPoint.Application();
 
-            PowerPoint.Presentation document = pptApplication.Presentations.Open(pptPath, ReadOnly: Office.MsoTriState.msoTrue, Office.MsoTriState.msoFalse, WithWindow: Office.MsoTriState.msoFalse);
+            PowerPoint.Presentations presentations = pptApplication.Presentations;
+
+            PowerPoint.Presentation document = presentations.Open(pptPath, ReadOnly: Office.MsoTriState.msoTrue, Office.MsoTriState.msoFalse, WithWindow: Office.MsoTriState.msoFalse);
             if (document == null)
             {
                 return 0;
@@ -28,9 +30,17 @@ namespace OfficeConvertPdfLibrary
             document.ExportAsFixedFormat(pdfPath, PowerPoint.PpFixedFormatType.ppFixedFormatTypePDF);
 
             document.Close();
-            document = null;
             pptApplication.Quit();
-            pptApplication = null;
+
+            //System.Runtime.InteropServices.Marshal.ReleaseComObject(rng);
+            //System.Runtime.InteropServices.Marshal.ReleaseComObject(ws);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(document);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(presentations);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(pptApplication);
+
+            //调用GC的垃圾收集方法
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
 
             return 1;
         }
@@ -40,7 +50,9 @@ namespace OfficeConvertPdfLibrary
             Word.Application wordApplication;
             wordApplication = new Word.Application();
 
-            Word.Document document = wordApplication.Documents.Open(WordPath, System.Reflection.Missing.Value, true);
+            Word.Documents documents = wordApplication.Documents;
+
+            Word.Document document = documents.Open(WordPath, System.Reflection.Missing.Value, true);
             if (document == null)
             {
                 return 0;
@@ -49,9 +61,17 @@ namespace OfficeConvertPdfLibrary
             document.ExportAsFixedFormat(pdfPath, Word.WdExportFormat.wdExportFormatPDF);
 
             document.Close();
-            document = null;
             wordApplication.Quit();
-            wordApplication = null;
+
+            //System.Runtime.InteropServices.Marshal.ReleaseComObject(rng);
+            //System.Runtime.InteropServices.Marshal.ReleaseComObject(ws);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(document);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(documents);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(wordApplication);
+
+            //调用GC的垃圾收集方法
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
 
             return 1;
         }
@@ -61,17 +81,28 @@ namespace OfficeConvertPdfLibrary
             Excel.Application excelApplication;
             excelApplication = new Excel.Application();
 
-            Excel.Workbook document = excelApplication.Workbooks.Open(ExcelPath, System.Reflection.Missing.Value, true);
+            //wbs 最后释放需要用到
+            Excel.Workbooks wbs = excelApplication.Workbooks;
+            Excel.Workbook document = wbs.Open(ExcelPath, System.Reflection.Missing.Value, true);
             if (document == null)
             {
                 return 0;
             }
             document.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF,pdfPath);
-
             document.Close();
-            document = null;
             excelApplication.Quit();
-            excelApplication = null;
+
+
+            //释放资源
+            //System.Runtime.InteropServices.Marshal.ReleaseComObject(rng);
+            //System.Runtime.InteropServices.Marshal.ReleaseComObject(ws);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(document);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(wbs);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApplication);
+
+            //调用GC的垃圾收集方法
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
 
             return 1;
         }
