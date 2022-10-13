@@ -23,32 +23,52 @@ namespace OfficeConvertPdfLibrary
         int pdfPageCount = 0;
         int CurrentOutputFilePathIndex = 0;
         String pngPath = "";
-        public int PowerPointConvertPdf(String pptPath,String pdfPath,String pngPath)
+
+        PowerPoint.Application pptApplication;
+        PowerPoint.Presentations presentations;
+        PowerPoint.Presentation document;
+
+        //释放ppt
+        private void ReleasePowerPoint()
         {
-            PowerPoint.Application pptApplication;
-            pptApplication = new PowerPoint.Application();
-
-            PowerPoint.Presentations presentations = pptApplication.Presentations;
-
-            PowerPoint.Presentation document = presentations.Open(pptPath, ReadOnly: Office.MsoTriState.msoTrue, Office.MsoTriState.msoFalse, WithWindow: Office.MsoTriState.msoFalse);
-            if (document == null)
+            if (document != null)
             {
-                return 0;
+                document.Close();
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(document);
+                document = null;
             }
-            document.ExportAsFixedFormat(pdfPath, PowerPoint.PpFixedFormatType.ppFixedFormatTypePDF);
-
-            document.Close();
-            pptApplication.Quit();
-
-            //System.Runtime.InteropServices.Marshal.ReleaseComObject(rng);
-            //System.Runtime.InteropServices.Marshal.ReleaseComObject(ws);
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(document);
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(presentations);
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(pptApplication);
-
-            //调用GC的垃圾收集方法
+            if(presentations != null)
+            {
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(presentations);
+                presentations = null;
+            }
+            if (presentations != null)
+            {
+                pptApplication.Quit();
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(pptApplication);
+                presentations = null;
+            }
             GC.Collect();
             GC.WaitForPendingFinalizers();
+        }
+
+        public int PowerPointConvertPdf(String pptPath,String pdfPath,String pngPath)
+        {
+            pptApplication = new PowerPoint.Application();
+            presentations = pptApplication.Presentations;
+
+            try
+            {
+                document = presentations.Open(pptPath, ReadOnly: Office.MsoTriState.msoTrue, Office.MsoTriState.msoFalse, WithWindow: Office.MsoTriState.msoFalse);
+                document.ExportAsFixedFormat(pdfPath, PowerPoint.PpFixedFormatType.ppFixedFormatTypePDF);
+            }
+            catch
+            {
+                ReleasePowerPoint();
+                return 0;
+            }
+
+            ReleasePowerPoint();
 
             ConvertPdf(pdfPath, pngPath);
 
@@ -138,7 +158,7 @@ namespace OfficeConvertPdfLibrary
                     {
                         image.Scale(new Percentage(100 / PdfSuperSamplingRatio));
                     }
-                    pngPath = String.Format("{0}\\png-{1}.png", OutputFilePath,CurrentOutputFilePathIndex);
+                    pngPath = String.Format("{0}\\png{1}.png", OutputFilePath,CurrentOutputFilePathIndex);
                     ConvertImage(image, true);
 
                     CurrentOutputFilePathIndex++;
